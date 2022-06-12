@@ -6,6 +6,12 @@ Log in with your zaptec credentials, and select charger or ID you wish to look a
 
 Visit the production build at https://zaptec-billing.netlify.app
 
+## TODO:
+- [ ] Select Charger and or User
+- [ ] Select Pool spot prices region
+- [ ] Fetch charging sessions from Zaptec API
+- [ ] Calculate prices
+- [ ] Script to refresh prices from Nordpool
 
 
 ## Getting Started
