@@ -20,14 +20,29 @@ export default function Home() {
     <Grid mt={3} container justifyContent={"center"} alignItems={"center"}>
       <Grid item>
         <Card>
-          <CardContent>
-            <Typography mb={3} variant={"h5"}>Zaptec Billing Login</Typography>
-            <TextField sx={{marginBottom: 3}} label={"Username"} fullWidth />
-            <TextField sx={{marginBottom: 3}} label={"Password"} fullWidth type={"password"} />
-          </CardContent>
-          <CardActions>
-            <Button>Login</Button>
-          </CardActions>
+          <form action={"/api/login"} method={"post"}>
+            <CardContent>
+              <Typography mb={3} variant={"h5"}>
+                Zaptec Billing Login
+              </Typography>
+              <TextField
+                name={"username"}
+                sx={{ marginBottom: 3 }}
+                label={"Username"}
+                fullWidth
+              />
+              <TextField
+                name={"password"}
+                sx={{ marginBottom: 3 }}
+                label={"Password"}
+                fullWidth
+                type={"password"}
+              />
+            </CardContent>
+            <CardActions>
+              <Button type={"submit"}>Login</Button>
+            </CardActions>
+          </form>
         </Card>
       </Grid>
     </Grid>
