@@ -1,20 +1,25 @@
 import { withIronSessionApiRoute } from "iron-session/next";
+import fetch from "node-fetch";
+import { login } from "../../src/server/zaptectApi";
 
 export default withIronSessionApiRoute(
   async function loginRoute(req, res) {
-    // get user from database then:
-    const { username, password } = req.body;
+    try {
+      const { username, password } = req.body;
+      const { access_token, expires_in } = login(username, password);
 
-    // @ts-ignore
-    req.session.user = { username, password };
-    await req.session.save();
+      req.session.user = { username, access_token, expires_in };
+      await req.session.save();
 
-    res.redirect(301, "/dashboard");
+      res.redirect(301, "/dashboard");
+    } catch (e) {
+      res.redirect(301, "/?error=access_denied");
+    }
   },
   {
     cookieName: "zaptec_user",
     password: process.env.SESSION_KEY,
-    // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
+    ttl: 12 * 60 * 60, // 12 hours
     cookieOptions: {
       secure: process.env.NODE_ENV === "production",
     },
