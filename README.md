@@ -1,4 +1,12 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Zaptec Billing
+
+A Zaptec App to check spot electricity prices for calculating bill.
+
+Log in with your zaptec credentials, and select charger or ID you wish to look at.
+
+Visit the production build at https://zaptec-billing.netlify.app
+
+
 
 ## Getting Started
 
