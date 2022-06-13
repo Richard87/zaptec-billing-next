@@ -1,4 +1,5 @@
 import { withIronSessionSsr } from "iron-session/next";
+import {useQuery} from "react-query"
 import {
   Button,
   Card,
@@ -16,34 +17,25 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useState } from "react";
-import { getChargers } from "../../src/server/zaptectApi";
+import {COOKIE} from "../../src/cookie";
 
 export const getServerSideProps = withIronSessionSsr(
   async function getServerSideProps({ req }) {
-    const { access_token, username } = req.session.user;
-    const chargers = await getChargers(access_token);
+    const { username } = req.session.user;
 
     return {
       props: {
         user: username,
-        chargers: chargers,
       },
     };
   },
-  {
-    cookieName: "zaptec_user",
-    password: process.env.SESSION_KEY,
-    // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
-    cookieOptions: {
-      secure: process.env.NODE_ENV === "production",
-    },
-  }
+    COOKIE
 );
 
-export default function Dashbiard({ user, chargers }) {
+export default function Dashboard({ user }) {
   const [selection, setSelection] = useState([]);
-
-  console.log(user, chargers);
+  const {data, isLoading, isFetching} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
+  const chargers = data ?? []
 
   const onChange = (e, args) => {
     setSelection(e.target.value);
