@@ -1,5 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
+import {COOKIE} from "../src/cookie"
+import { withIronSessionSsr } from "iron-session/next";
 import styles from "../styles/Home.module.css";
 import {
   Button,
@@ -14,6 +16,26 @@ import {
   CardActions,
   CardHeader,
 } from "@mui/material";
+
+export const getServerSideProps = withIronSessionSsr(
+    async function ({req, res,}) {
+      const user = req.session.user;
+
+      if (user !== undefined) {
+        res.setHeader("location", "/dashboard");
+        res.statusCode = 302;
+        res.end();
+        return {
+          props: {},
+        };
+      }
+
+      return {
+        props: {},
+      };
+    },
+    COOKIE
+);
 
 export default function Home() {
   return (

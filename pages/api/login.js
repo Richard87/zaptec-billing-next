@@ -1,27 +1,42 @@
 import { withIronSessionApiRoute } from "iron-session/next";
 import fetch from "node-fetch";
-import { login } from "../../src/server/zaptectApi";
+import {COOKIE} from "../../src/cookie"
 
 export default withIronSessionApiRoute(
-  async function loginRoute(req, res) {
-    try {
-      const { username, password } = req.body;
-      const { access_token, expires_in } = login(username, password);
+    async function loginRoute(req, res) {
+        const { username, password } = req.body;
+        if (!username) {
+            console.error(data);
+            res.redirect(301, "/?error=username_missing");
+            return
+        }
+        if (!password) {
+            console.error(data);
+            res.redirect(301, "/?error=password_missing");
+            return
+        }
 
-      req.session.user = { username, access_token, expires_in };
-      await req.session.save();
 
-      res.redirect(301, "/dashboard");
-    } catch (e) {
-      res.redirect(301, "/?error=access_denied");
-    }
-  },
-  {
-    cookieName: "zaptec_user",
-    password: process.env.SESSION_KEY,
-    ttl: 12 * 60 * 60, // 12 hours
-    cookieOptions: {
-      secure: process.env.NODE_ENV === "production",
+        const response = await fetch("https://api.zaptec.com/oauth/token", {
+            method: "POST",
+            body: `grant_type=password&username=${username}&password=${password}`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                Accept: "application/json",
+            },
+        });
+        const data = await response.json();
+
+
+        if (response.status !== 200) {
+            console.error(data);
+            res.redirect(301, "/?error=access_denied");
+            return
+        }
+
+        req.session.user = { username, ...data };
+        await req.session.save();
+
+        res.redirect(301, "/dashboard");
     },
-  }
-);
+COOKIE);
