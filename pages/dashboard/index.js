@@ -12,6 +12,7 @@ import WorkIcon from '@mui/icons-material/Work';
 import BeachAccessIcon from '@mui/icons-material/BeachAccess';
 import { useState } from "react";
 import {COOKIE} from "../../src/cookie";
+import Head from "next/head";
 
 
 export const getServerSideProps = withIronSessionSsr(
@@ -39,19 +40,19 @@ export default function Dashboard() {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
 
-  const {data: chargers, isFetching: isFetchingChargers} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
-  const {data: sessions, isFetching: isFetchingSessions} = useQuery(
-      "sessions",
+  const {data: chargers, isFetching: isFetchingChargers, isLoading: isLoadingChargers} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
+  const {data: sessions, isFetching: isFetchingSessions, isLoading: isLoadingSessions} = useQuery(
+      "sessions-"+charger,
       () => fetch(`/api/sessions?charger=${charger}`).then(res => res.json()),
-      {
-          enabled: !!charger,
-          refetchOnMount: false, refetchOnReconnect: false, refetchInterval: false,
-          refetchIntervalInBackground: false, refetchOnWindowFocus: false
-      }
+      {enabled: !!charger}
   )
 
   return (
-      <Grid mt={3} spacing={3} container justifyContent={"center"} alignItems={"center"}>
+      <>
+        <Head>
+          <title>Zaptec charging price</title>
+        </Head>
+        <Grid mt={3} spacing={3} container justifyContent={"center"} alignItems={"center"}>
         <Grid item sm={8} xs={12}>
           <SettingsCard
               chargers={chargers ?? []}
@@ -64,16 +65,19 @@ export default function Dashboard() {
               end={endDate}
               onChangeEnd={e => setEndDate(e.target.value)}
           />
-          {(isFetchingSessions || isFetchingChargers) && <LinearProgress />}
+          {(isFetchingSessions || isFetchingChargers || isLoadingChargers || isLoadingSessions) && <LinearProgress/>}
         </Grid>
         {sessions && startDate && endDate && <Grid mb={3} item sm={8} xs={12}>
-          <ReportCard sessions={sessions} start={startDate} end={endDate}/>
+          <ReportCard key={charger} charger={charger} sessions={sessions} start={startDate} end={endDate}/>
         </Grid>}
-      </Grid>
+      </Grid></>
   );
 }
 
 function SettingsCard({chargers, onChangeCharger, onChangeStart, onChangeEnd, charger, start,end}) {
+
+  console.log(charger, chargers)
+
   return <Card>
     <CardContent>
       <Grid container spacing={3}>
@@ -120,7 +124,7 @@ function SettingsCard({chargers, onChangeCharger, onChangeStart, onChangeEnd, ch
   </Card>;
 }
 
-const ReportCard = ({start, end, sessions}) => {
+const ReportCard = ({charger, start, end, sessions}) => {
   start = parseISO(start)
   end = parseISO(end)
 
@@ -141,6 +145,9 @@ const ReportCard = ({start, end, sessions}) => {
       </TableHead>
       <TableBody>
         {sessions.map((session, i) => {
+          if (charger !== session.ChargerId)
+            return null
+
           const sStart = parseISO(session.StartDateTime)
           const sEnd = parseISO(session.EndDateTime)
 
@@ -176,6 +183,7 @@ const ReportCard = ({start, end, sessions}) => {
           <TableRow><TableCell colSpan={4} align={"right"}><strong>Sessions:</strong></TableCell><TableCell>{sessionCount}</TableCell></TableRow>
           <TableRow><TableCell colSpan={4} align={"right"}><strong>Energy:</strong></TableCell><TableCell>{Math.round(totalEnergy * 100) / 100 + "kW"}</TableCell></TableRow>
           <TableRow><TableCell colSpan={4} align={"right"}><strong>Spot price:</strong></TableCell><TableCell>{totalSpotPrice}</TableCell></TableRow>
+        <TableRow><TableCell colSpan={4} align={"right"}><strong>Charger:</strong></TableCell><TableCell>{charger}</TableCell></TableRow>
       </TableBody>
       <TableFooter>
       </TableFooter>
