@@ -75,9 +75,6 @@ export default function Dashboard() {
 }
 
 function SettingsCard({chargers, onChangeCharger, onChangeStart, onChangeEnd, charger, start,end}) {
-
-  console.log(charger, chargers)
-
   return <Card>
     <CardContent>
       <Grid container spacing={3}>
