@@ -145,9 +145,6 @@ const ReportCard = ({charger, start, end, sessions}) => {
       </TableHead>
       <TableBody>
         {sessions.map((session, i) => {
-          if (charger !== session.ChargerId)
-            return null
-
           const sStart = parseISO(session.StartDateTime)
           const sEnd = parseISO(session.EndDateTime)
 
@@ -183,7 +180,6 @@ const ReportCard = ({charger, start, end, sessions}) => {
           <TableRow><TableCell colSpan={4} align={"right"}><strong>Sessions:</strong></TableCell><TableCell>{sessionCount}</TableCell></TableRow>
           <TableRow><TableCell colSpan={4} align={"right"}><strong>Energy:</strong></TableCell><TableCell>{Math.round(totalEnergy * 100) / 100 + "kW"}</TableCell></TableRow>
           <TableRow><TableCell colSpan={4} align={"right"}><strong>Spot price:</strong></TableCell><TableCell>{totalSpotPrice}</TableCell></TableRow>
-        <TableRow><TableCell colSpan={4} align={"right"}><strong>Charger:</strong></TableCell><TableCell>{charger}</TableCell></TableRow>
       </TableBody>
       <TableFooter>
       </TableFooter>
