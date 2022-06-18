@@ -78,11 +78,6 @@ function SettingsCard({chargers, onChangeCharger, onChangeStart, onChangeEnd, ch
     <CardContent>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant={"h5"}>
-            Chose chargers
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
           <TextField
               fullWidth
               value={charger}
