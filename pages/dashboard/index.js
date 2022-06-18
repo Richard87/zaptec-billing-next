@@ -2,7 +2,7 @@ import { withIronSessionSsr } from "iron-session/next";
 import {format, formatDistance, isBefore, isAfter, parseISO} from "date-fns"
 import {useQuery} from "react-query"
 import {
-  Button, Card,
+  Button, Card, LinearProgress,
   CardActions, CardContent, Grid, TextField, Typography, FormControl, InputLabel, Select,
   OutlinedInput, Box,Paper, Chip,List, ListItem,ListItemText,ListItemAvatar, Avatar,
   MenuItem, Table,  TableContainer,TableBody,TableRow, TableCell,TableHead, TableFooter
@@ -35,10 +35,20 @@ export const getServerSideProps = withIronSessionSsr(
 );
 
 export default function Dashboard() {
-  const {data: chargers, isLoading, isFetching} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
   const [charger, setCharger] = useState('');
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
+
+  const {data: chargers, isFetching: isFetchingChargers} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
+  const {data: sessions, isFetching: isFetchingSessions} = useQuery(
+      "sessions",
+      () => fetch(`/api/sessions?charger=${charger}`).then(res => res.json()),
+      {
+          enabled: !!charger,
+          refetchOnMount: false, refetchOnReconnect: false, refetchInterval: false,
+          refetchIntervalInBackground: false, refetchOnWindowFocus: false
+      }
+  )
 
   return (
       <Grid mt={3} spacing={3} container justifyContent={"center"} alignItems={"center"}>
@@ -54,9 +64,10 @@ export default function Dashboard() {
               end={endDate}
               onChangeEnd={e => setEndDate(e.target.value)}
           />
+          {(isFetchingSessions || isFetchingChargers) && <LinearProgress />}
         </Grid>
-        {charger && startDate && endDate && <Grid item sm={8} xs={12}>
-          <ReportCard charger={charger} start={startDate} end={endDate}/>
+        {sessions && startDate && endDate && <Grid mb={3} item sm={8} xs={12}>
+          <ReportCard sessions={sessions} start={startDate} end={endDate}/>
         </Grid>}
       </Grid>
   );
@@ -114,16 +125,7 @@ function SettingsCard({chargers, onChangeCharger, onChangeStart, onChangeEnd, ch
   </Card>;
 }
 
-const ReportCard = ({charger, start, end}) => {
-  const {data: sessions, isLoading, isFetching} = useQuery(
-      "sessions",
-      () => fetch(`/api/sessions?charger=${charger}`).then(res => res.json()),
-      {refetchOnMount: false, refetchOnReconnect: false, refetchInterval: false, refetchIntervalInBackground: false, refetchOnWindowFocus: false}
-  )
-
-
-  if(!sessions) return null;
-
+const ReportCard = ({start, end, sessions}) => {
   start = parseISO(start)
   end = parseISO(end)
 
@@ -175,33 +177,12 @@ const ReportCard = ({charger, start, end}) => {
           )
         })}
       </TableBody>
+      <TableBody>
+          <TableRow><TableCell colSpan={4} align={"right"}><strong>Sessions:</strong></TableCell><TableCell>{sessionCount}</TableCell></TableRow>
+          <TableRow><TableCell colSpan={4} align={"right"}><strong>Energy:</strong></TableCell><TableCell>{Math.round(totalEnergy * 100) / 100 + "kW"}</TableCell></TableRow>
+          <TableRow><TableCell colSpan={4} align={"right"}><strong>Spot price:</strong></TableCell><TableCell>{totalSpotPrice}</TableCell></TableRow>
+      </TableBody>
       <TableFooter>
-        <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-        <ListItem>
-          <ListItemAvatar>
-            <Avatar>
-              <ImageIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText primary="Sessions" secondary={sessionCount} />
-        </ListItem>
-        <ListItem>
-          <ListItemAvatar>
-            <Avatar>
-              <WorkIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText primary="Energy" secondary={Math.round(totalEnergy * 100) / 100 + "kW"} />
-        </ListItem>
-        <ListItem>
-          <ListItemAvatar>
-            <Avatar>
-              <BeachAccessIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText primary="Spot price" secondary={totalSpotPrice} />
-        </ListItem>
-      </List>
       </TableFooter>
     </Table>
   </TableContainer></>
