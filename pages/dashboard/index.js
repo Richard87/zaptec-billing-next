@@ -40,8 +40,8 @@ export default function Dashboard() {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
 
-  const {data: chargers, isFetching: isFetchingChargers, isLoading: isLoadingChargers} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
-  const {data: sessions, isFetching: isFetchingSessions, isLoading: isLoadingSessions} = useQuery(
+  const {data: chargers, isLoading: isLoadingChargers} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
+  const {data: sessions, isLoading: isLoadingSessions} = useQuery(
       "sessions-"+charger,
       () => fetch(`/api/sessions?charger=${charger}`).then(res => res.json()),
       {enabled: !!charger}
@@ -65,7 +65,7 @@ export default function Dashboard() {
               end={endDate}
               onChangeEnd={e => setEndDate(e.target.value)}
           />
-          {(isFetchingSessions || isFetchingChargers || isLoadingChargers || isLoadingSessions) && <LinearProgress/>}
+          {(isLoadingChargers || isLoadingSessions) && <LinearProgress/>}
         </Grid>
         {sessions && startDate && endDate && <Grid mb={3} item sm={8} xs={12}>
           <ReportCard key={charger} charger={charger} sessions={sessions} start={startDate} end={endDate}/>

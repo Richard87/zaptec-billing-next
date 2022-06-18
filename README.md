@@ -8,9 +8,9 @@ Visit the production build at https://zaptec-billing.netlify.app
 
 ## TODO:
 - [X] Select Charger and or User
-- [ ] Select date-range and fetch charging sessions (store selection in local storage)
-- [ ] Select Pool spot prices region
-- [ ] Fetch charging sessions from Zaptec API
+- [X] Select date-range and fetch charging sessions (store selection in local storage)
+- [ ] ~~Select Pool spot prices region~~
+- [X] Fetch charging sessions from Zaptec API
 - [ ] Calculate prices
 - [ ] Script to refresh prices from Nordpool
 
