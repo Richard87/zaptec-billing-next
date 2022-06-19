@@ -108,7 +108,7 @@ function SettingsCard({chargers, onChangeCharger, onChangeStart, onChangeEnd, ch
                 InputLabelProps={{shrink: true}}
                 fullWidth
                 label={"End day"}
-                helperText={"Include all charges stopped before midnight"}
+                helperText={"Include all charges started before midnight"}
                 value={end}
                 onChange={onChangeEnd}
                 type="date"
