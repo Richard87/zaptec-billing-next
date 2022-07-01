@@ -1,5 +1,5 @@
 import { withIronSessionSsr } from "iron-session/next";
-import {format, formatDistance, isBefore, isAfter, parseISO} from "date-fns"
+import {format, formatDistance, isBefore, isAfter, parseISO, startOfHour,formatRFC3339,formatISO} from "date-fns"
 import {useQuery} from "react-query"
 import {
   Button, Card, LinearProgress,
@@ -152,11 +152,32 @@ const ReportCard = ({charger, start, end, sessions}) => {
             return null
 
           sessionCount++
-          totalEnergy += session.Energy
-          totalSpotPrice += 0.0
 
           const distance = formatDistance(sStart, sEnd)
-          const energy = Math.round(session.Energy * 100) / 100
+
+          let [sessionPrice, sessionEnergy] = (session.EnergyDetails ?? []).reduce((session, {Timestamp, Energy}) => {
+              const d = startOfHour(parseISO(Timestamp));
+              let s = d.toISOString().substring(0,19) + "Z";
+              const p = Prices[s] //
+              session[0] += p * Energy
+              session[1] += Energy
+
+              return session
+          }, [0.0, 0.0])
+
+          // If the charger is offline, we might not have EnergyDetails, lets just use the price from start of the session
+          // Todo: use the average spot price from the duration of the session instead.
+          if (sessionEnergy < 1) {
+            const d = startOfHour(parseISO(session.StartDateTime));
+            let s = d.toISOString().substring(0,19) + "Z";
+            sessionEnergy = session.Energy
+            sessionPrice = session.Energy * Prices[s]
+          }
+          const energy = Math.round(sessionEnergy * 100) / 100
+          const price = Math.round(sessionPrice) / 100 // convert øre til kr
+
+          totalSpotPrice += sessionPrice
+          totalEnergy += session.Energy
 
           return (
               <TableRow
@@ -168,16 +189,17 @@ const ReportCard = ({charger, start, end, sessions}) => {
                 </TableCell>
                 <TableCell align="right">{distance}</TableCell>
                 <TableCell align="right">{energy}kW</TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell align="right">{price}kr</TableCell>
                 <TableCell align="right">{session.UserFullName}</TableCell>
               </TableRow>
           )
         })}
       </TableBody>
       <TableBody>
-          <TableRow><TableCell colSpan={4} align={"right"}><strong>Sessions:</strong></TableCell><TableCell>{sessionCount}</TableCell></TableRow>
-          <TableRow><TableCell colSpan={4} align={"right"}><strong>Energy:</strong></TableCell><TableCell>{Math.round(totalEnergy * 100) / 100 + "kW"}</TableCell></TableRow>
-          <TableRow><TableCell colSpan={4} align={"right"}><strong>Spot price:</strong></TableCell><TableCell>{totalSpotPrice}</TableCell></TableRow>
+        <TableRow><TableCell colSpan={4} align={"right"}><strong>Sessions:</strong></TableCell><TableCell>{sessionCount}</TableCell></TableRow>
+        <TableRow><TableCell colSpan={4} align={"right"}><strong>Energy:</strong></TableCell><TableCell>{Math.round(totalEnergy * 100) / 100 + "kW"}</TableCell></TableRow>
+        <TableRow><TableCell colSpan={4} align={"right"}><strong>Net Spot price:</strong></TableCell><TableCell>{Math.round(totalSpotPrice) / 100}kr</TableCell></TableRow>
+        <TableRow><TableCell colSpan={4} align={"right"}><strong>Spot (incl. 7øre påslag):</strong></TableCell><TableCell>{Math.round(totalSpotPrice + (totalEnergy * 7)) / 100}kr</TableCell></TableRow>
       </TableBody>
       <TableFooter>
       </TableFooter>
