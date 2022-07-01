@@ -137,7 +137,7 @@ const ReportCard = ({charger, start, end, sessions}) => {
           <TableCell>Start</TableCell>
           <TableCell align="right">Duration</TableCell>
           <TableCell align="right">Energy</TableCell>
-          <TableCell align="right">Spot Price</TableCell>
+          <TableCell align="right">Price</TableCell>
           <TableCell align="right">User</TableCell>
         </TableRow>
       </TableHead>
