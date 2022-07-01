@@ -6,6 +6,12 @@ Log in with your zaptec credentials, and select charger or ID you wish to look a
 
 Visit the production build at https://zaptec-billing.netlify.app
 
+## License:
+
+- the file `pages/dashboard/prices.json` is PROPRIETARY and not allowed to use, please find your own spot electricity prices, and format accordingly if you use this project.
+- everything else is MIT licensend.
+
+
 ## TODO:
 - [X] Select Charger and or User
 - [X] Select date-range and fetch charging sessions (store selection in local storage)

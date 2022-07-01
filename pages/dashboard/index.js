@@ -13,6 +13,7 @@ import BeachAccessIcon from '@mui/icons-material/BeachAccess';
 import { useState } from "react";
 import {COOKIE} from "../../src/cookie";
 import Head from "next/head";
+import Prices from "./prices.json"
 
 
 export const getServerSideProps = withIronSessionSsr(

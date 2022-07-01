@@ -37,3 +37,7 @@ yarn-error.log*
 
 # Local Netlify folder
 .netlify
+
+README.local.md
+2021-*
+2022-*
