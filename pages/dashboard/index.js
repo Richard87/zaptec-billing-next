@@ -199,7 +199,6 @@ const ReportCard = ({charger, start, end, sessions}) => {
         <TableRow><TableCell colSpan={4} align={"right"}><strong>Sessions:</strong></TableCell><TableCell>{sessionCount}</TableCell></TableRow>
         <TableRow><TableCell colSpan={4} align={"right"}><strong>Energy:</strong></TableCell><TableCell>{Math.round(totalEnergy * 100) / 100 + "kW"}</TableCell></TableRow>
         <TableRow><TableCell colSpan={4} align={"right"}><strong>Net Spot price:</strong></TableCell><TableCell>{Math.round(totalSpotPrice) / 100}kr</TableCell></TableRow>
-        <TableRow><TableCell colSpan={4} align={"right"}><strong>Spot (incl. 7øre påslag):</strong></TableCell><TableCell>{Math.round(totalSpotPrice + (totalEnergy * 7)) / 100}kr</TableCell></TableRow>
       </TableBody>
       <TableFooter>
       </TableFooter>
