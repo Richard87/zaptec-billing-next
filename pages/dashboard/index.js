@@ -15,6 +15,16 @@ import {COOKIE} from "../../src/cookie";
 import Head from "next/head";
 import Prices from "./prices.json"
 
+const PRICE_SUPPORT = {
+  "2022.07": 192.78,
+  "2022.06": 116.67,
+  "2022.05": 95.32,
+  "2022.04": 103.89,
+  "2022.03": 117.04,
+  "2022.02": 50.54,
+  "2022.01": 70.63,
+  "2021.12": 73.62,
+}
 
 export const getServerSideProps = withIronSessionSsr(
     async function ({req, res,}) {
@@ -129,6 +139,7 @@ const ReportCard = ({charger, start, end, sessions}) => {
   let sessionCount = 0.0
   let totalEnergy = 0.0
   let totalSpotPrice = 0.0
+  let totalSupport = 0.0
 
   return <><TableContainer mb={3} component={Paper}>
     <Table>
@@ -138,6 +149,7 @@ const ReportCard = ({charger, start, end, sessions}) => {
           <TableCell align="right">Duration</TableCell>
           <TableCell align="right">Energy</TableCell>
           <TableCell align="right">Price</TableCell>
+          <TableCell align="right">Gov. support</TableCell>
           <TableCell align="right">User</TableCell>
         </TableRow>
       </TableHead>
@@ -155,28 +167,34 @@ const ReportCard = ({charger, start, end, sessions}) => {
 
           const distance = formatDistance(sStart, sEnd)
 
-          let [sessionPrice, sessionEnergy] = (session.EnergyDetails ?? []).reduce((session, {Timestamp, Energy}) => {
-              const d = startOfHour(parseISO(Timestamp));
-              let s = d.toISOString().substring(0,19) + "Z";
-              const p = Prices[s] //
-              session[0] += p * Energy
-              session[1] += Energy
+          let [sessionPrice, sessionEnergy, sessionSupport] = (session.EnergyDetails ?? []).reduce((session, {Timestamp, Energy}) => {
+            const d = startOfHour(parseISO(Timestamp));
+            let s = d.toISOString().substring(0,19) + "Z";
+            const month = format(d, "yyyy.MM")
+            const p = Prices[s] ?? 0 //
+            session[0] += p * Energy
+            session[1] += Energy
+            session[2] += Energy * -(PRICE_SUPPORT[month] ?? 0)
 
-              return session
-          }, [0.0, 0.0])
+            return session
+          }, [0.0, 0.0, 0.0])
 
           // If the charger is offline, we might not have EnergyDetails, lets just use the price from start of the session
           // Todo: use the average spot price from the duration of the session instead.
           if (sessionEnergy < 1) {
             const d = startOfHour(parseISO(session.StartDateTime));
             let s = d.toISOString().substring(0,19) + "Z";
+            const month = format(d, "yyyy.MM")
             sessionEnergy = session.Energy
             sessionPrice = session.Energy * Prices[s]
+            sessionSupport = Math.round(sessionEnergy * -(PRICE_SUPPORT[month] ?? 0))
           }
           const energy = Math.round(sessionEnergy * 100) / 100
           const price = Math.round(sessionPrice) / 100 // convert øre til kr
+          const support = Math.round(sessionSupport) / 100
 
           totalSpotPrice += sessionPrice
+          totalSupport += sessionSupport
           totalEnergy += session.Energy
 
           return (
@@ -190,6 +208,7 @@ const ReportCard = ({charger, start, end, sessions}) => {
                 <TableCell align="right">{distance}</TableCell>
                 <TableCell align="right">{energy}kW</TableCell>
                 <TableCell align="right">{price}kr</TableCell>
+                <TableCell align="right">{support}kr</TableCell>
                 <TableCell align="right">{session.UserFullName}</TableCell>
               </TableRow>
           )
@@ -198,7 +217,9 @@ const ReportCard = ({charger, start, end, sessions}) => {
       <TableBody>
         <TableRow><TableCell colSpan={4} align={"right"}><strong>Sessions:</strong></TableCell><TableCell>{sessionCount}</TableCell></TableRow>
         <TableRow><TableCell colSpan={4} align={"right"}><strong>Energy:</strong></TableCell><TableCell>{Math.round(totalEnergy * 100) / 100 + "kW"}</TableCell></TableRow>
-        <TableRow><TableCell colSpan={4} align={"right"}><strong>Net Spot price:</strong></TableCell><TableCell>{Math.round(totalSpotPrice) / 100}kr</TableCell></TableRow>
+        <TableRow><TableCell colSpan={4} align={"right"}><strong>Spot price:</strong></TableCell><TableCell>{Math.round(totalSpotPrice) / 100}kr</TableCell></TableRow>
+        <TableRow><TableCell colSpan={4} align={"right"}><strong>Total gov. support:</strong></TableCell><TableCell>{Math.round(totalSupport) / 100}kr</TableCell></TableRow>
+        <TableRow><TableCell colSpan={4} align={"right"}><strong>Totat:</strong></TableCell><TableCell>{Math.round(totalSpotPrice + totalSupport) / 100}kr</TableCell></TableRow>
       </TableBody>
       <TableFooter>
       </TableFooter>

@@ -3,6 +3,7 @@ const fs = require("fs");
 const files = [
     "2021-10.json", "2021-11.json", "2021-12.json",
     "2022-01.json", "2022-02.json", "2022-03.json", "2022-04.json", "2022-05.json", "2022-06.json",
+    "2022-07.json",
 ]
 
 /**
@@ -22,4 +23,4 @@ files.forEach(file => {
     })
 })
 
-fs.writeFileSync("prices.json", JSON.stringify(prices,null, 2))
+fs.writeFileSync("pages/dashboard/prices.json", JSON.stringify(prices,null, 2))

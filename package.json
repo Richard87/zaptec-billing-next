@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier -w pages"
+    "format": "prettier -w pages",
+    "prices": "node parse.js"
   },
   "dependencies": {
     "@emotion/cache": "^11.9.3",
