@@ -14,17 +14,7 @@ import { useState } from "react";
 import {COOKIE} from "../../src/cookie";
 import Head from "next/head";
 import Prices from "./prices.json"
-
-const PRICE_SUPPORT = {
-  "2022.07": 192.78,
-  "2022.06": 116.67,
-  "2022.05": 95.32,
-  "2022.04": 103.89,
-  "2022.03": 117.04,
-  "2022.02": 50.54,
-  "2022.01": 70.63,
-  "2021.12": 73.62,
-}
+import SupportPrice from "./support.json"
 
 export const getServerSideProps = withIronSessionSsr(
     async function ({req, res,}) {
@@ -174,7 +164,7 @@ const ReportCard = ({charger, start, end, sessions}) => {
             const p = Prices[s] ?? 0 //
             session[0] += p * Energy
             session[1] += Energy
-            session[2] += Energy * -(PRICE_SUPPORT[month] ?? 0)
+            session[2] += Energy * -(SupportPrice[month] ?? 0)
 
             return session
           }, [0.0, 0.0, 0.0])
@@ -187,7 +177,7 @@ const ReportCard = ({charger, start, end, sessions}) => {
             const month = format(d, "yyyy.MM")
             sessionEnergy = session.Energy
             sessionPrice = session.Energy * Prices[s]
-            sessionSupport = Math.round(sessionEnergy * -(PRICE_SUPPORT[month] ?? 0))
+            sessionSupport = Math.round(sessionEnergy * -(SupportPrice[month] ?? 0))
           }
           const energy = Math.round(sessionEnergy * 100) / 100
           const price = Math.round(sessionPrice) / 100 // convert øre til kr

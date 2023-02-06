@@ -42,3 +42,12 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
+## Fetch price data from tibber:
+```http request
+POST https://api.tibber.com/v1-beta/gql
+Authorization: Bearer ACCESS_TOKEN
+Content-Type: application/json
+
+{"query":"{\n  viewer {\n    homes {\n      currentSubscription{\n        priceInfo{\n          range(resolution:HOURLY, last: 1000) {\n            pageInfo {\n              endCursor\n              startCursor\n              endCursor\n              hasNextPage\n              hasPreviousPage\n              count\n              precision\n              resolution\n            }\n            nodes {\n              startsAt\n              currency\n              total\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"}
+
+```
