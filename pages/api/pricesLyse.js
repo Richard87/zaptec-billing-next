@@ -15,7 +15,7 @@ const FetchPricesLyse = async (req, res) => {
    if (cachedResponse!==null && changedDate!=='true') {
       console.log('Fetch from cache')
       res.status(200).json(cachedResponse);
-   } else {
+   } else { 
 
    try {
          console.log('Fetch from API')
