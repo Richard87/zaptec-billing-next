@@ -8,9 +8,9 @@ import {
 import { useEffect, useState } from "react";
 import {COOKIE} from "../../src/cookie";
 import Head from "next/head";
-import Prices from "./old_prices/prices.json"
+// import Prices from "./old_prices/prices.json"
 import SupportPrice from "./support.json"
-import axios from 'axios'
+// import axios from 'axios'
 
 export const getServerSideProps = withIronSessionSsr(
     async function ({req, res,}) {

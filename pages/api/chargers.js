@@ -9,7 +9,7 @@ export default withIronSessionApiRoute(
 
             let Data = await FetchChargers(req.session.user.access_token);
 
-            console.log("chargers", Data)
+            // console.log("chargers", Data)
 
             res.status(200).json(Data)
         } catch (e) {
@@ -27,7 +27,7 @@ const FetchChargers = async (token) => {
     const cachedResponse = cache.get(url+token);
 
     if (cachedResponse) {
-        console.log(cachedResponse)
+        // console.log(cachedResponse)
         return cachedResponse;
     } else {
         const hours = 1;
