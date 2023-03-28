@@ -1,20 +1,16 @@
 import { withIronSessionSsr } from "iron-session/next";
-import {format, formatDistance, isBefore, isAfter, parseISO, startOfHour,formatRFC3339,formatISO} from "date-fns"
+import {format, formatDistance, isAfter, parseISO, startOfHour} from "date-fns"
 import {useQuery} from "react-query"
 import {
-  Button, Card, LinearProgress,
-  CardActions, CardContent, Grid, TextField, Typography, FormControl, InputLabel, Select,
-  OutlinedInput, Box,Paper, Chip,List, ListItem,ListItemText,ListItemAvatar, Avatar,
-  MenuItem, Table,  TableContainer,TableBody,TableRow, TableCell,TableHead, TableFooter
+  Card, LinearProgress,CardContent, Grid, TextField, 
+  MenuItem, Table,  TableContainer,TableBody,TableRow, TableCell,TableHead, TableFooter, Paper, Button
 } from "@mui/material";
-import ImageIcon from '@mui/icons-material/Image';
-import WorkIcon from '@mui/icons-material/Work';
-import BeachAccessIcon from '@mui/icons-material/BeachAccess';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {COOKIE} from "../../src/cookie";
 import Head from "next/head";
-import Prices from "./prices.json"
+import Prices from "./old_prices/prices.json"
 import SupportPrice from "./support.json"
+import axios from 'axios'
 
 export const getServerSideProps = withIronSessionSsr(
     async function ({req, res,}) {
@@ -40,19 +36,40 @@ export default function Dashboard() {
   const [charger, setCharger] = useState('');
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
+  const [change, setChange] = useState(false)
 
   const {data: chargers, isLoading: isLoadingChargers} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
+
   const {data: sessions, isLoading: isLoadingSessions} = useQuery(
       "sessions-"+charger,
       () => fetch(`/api/sessions?charger=${charger}`).then(res => res.json()),
       {enabled: !!charger}
   )
 
+  const {data: prices, isLoading: isLoadingPrices} = useQuery(
+    ["prices", startDate, endDate, change],
+    () => {
+      const res = fetch(`/api/pricesLyse?startDate=${startDate}&&endDate=${endDate}&&changedDate=${change}`).then(res => res.json())
+      setChange(false)
+      return res
+    },
+    {enabled: startDate!=="" && endDate!==""}
+  )
+  
+  useEffect(() => {
+    setChange(true)
+  },[startDate, endDate])
+  
+
   return (
       <>
+      {/* <Button onClick={()=>{
+        fetchLyse(true)
+      }}>Get</Button> */}
         <Head>
           <title>Zaptec charging price</title>
         </Head>
+      
         <Grid mt={3} spacing={3} container justifyContent={"center"} alignItems={"center"}>
         <Grid item sm={8} xs={12}>
           <SettingsCard
@@ -61,17 +78,23 @@ export default function Dashboard() {
               onChangeCharger={e => setCharger(e.target.value)}
 
               start={startDate}
-              onChangeStart={e => setStartDate(e.target.value)}
+              onChangeStart={e => {setStartDate(e.target.value); setChange(true)}}
 
               end={endDate}
-              onChangeEnd={e => setEndDate(e.target.value)}
+              onChangeEnd={e => {setEndDate(e.target.value); setChange(true)}}
           />
-          {(isLoadingChargers || isLoadingSessions) && <LinearProgress/>}
+          {(isLoadingChargers || isLoadingSessions || isLoadingPrices) && <LinearProgress/>}
         </Grid>
-        {sessions && startDate && endDate && <Grid mb={3} item sm={8} xs={12}>
-          <ReportCard key={charger} charger={charger} sessions={sessions} start={startDate} end={endDate}/>
+        {prices && sessions && startDate && endDate && <Grid mb={3} item sm={8} xs={12}>
+          <ReportCard key={charger} charger={charger} sessions={sessions} start={startDate} end={endDate} prices={prices}/>
         </Grid>}
-      </Grid></>
+      </Grid>
+       {/* <pre>
+          {JSON.stringify(prices, null, 2)}
+        </pre> */}
+      
+      </>
+
   );
 }
 
@@ -122,7 +145,7 @@ function SettingsCard({chargers, onChangeCharger, onChangeStart, onChangeEnd, ch
   </Card>;
 }
 
-const ReportCard = ({charger, start, end, sessions}) => {
+const ReportCard = ({charger, start, end, sessions, prices}) => {
   start = parseISO(start)
   end = parseISO(end)
 
@@ -144,7 +167,7 @@ const ReportCard = ({charger, start, end, sessions}) => {
         </TableRow>
       </TableHead>
       <TableBody>
-        {sessions.map((session, i) => {
+        {prices && sessions.map((session, i) => {
           const sStart = parseISO(session.StartDateTime)
           const sEnd = parseISO(session.EndDateTime)
 
@@ -161,7 +184,8 @@ const ReportCard = ({charger, start, end, sessions}) => {
             const d = startOfHour(parseISO(Timestamp));
             let s = d.toISOString().substring(0,19) + "Z";
             const month = format(d, "yyyy.MM")
-            const p = Prices[s] ?? 0 //
+            // console.log(s, prices[s])
+            const p = prices[s] ?? 0 //
             session[0] += p * Energy
             session[1] += Energy
             session[2] += Energy * -(SupportPrice[month] ?? 0)
@@ -176,7 +200,7 @@ const ReportCard = ({charger, start, end, sessions}) => {
             let s = d.toISOString().substring(0,19) + "Z";
             const month = format(d, "yyyy.MM")
             sessionEnergy = session.Energy
-            sessionPrice = session.Energy * Prices[s]
+            sessionPrice = session.Energy * prices[s]
             sessionSupport = Math.round(sessionEnergy * -(SupportPrice[month] ?? 0))
           }
           const energy = Math.round(sessionEnergy * 100) / 100
