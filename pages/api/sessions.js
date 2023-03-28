@@ -41,7 +41,7 @@ const FetchPage = async (charger, page, token) => {
     } else {
         const hours = 24;
 
-        console.debug("Sessions", url)
+        // console.debug("Sessions", url)
         const response = await fetch(url, {headers: {"Authorization":`Bearer ${token}`}})
         const {Data} = await response.json()
 
