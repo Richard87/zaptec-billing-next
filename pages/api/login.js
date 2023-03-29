@@ -15,7 +15,7 @@ export default withIronSessionApiRoute(
             res.redirect(301, "/?error=password_missing");
             return
         }
-
+        
 
         const response = await fetch("https://api.zaptec.com/oauth/token", {
             method: "POST",
@@ -28,8 +28,9 @@ export default withIronSessionApiRoute(
         const data = await response.json();
 
 
+
         if (response.status !== 200) {
-            console.error(data);
+            // console.error(data);
             res.redirect(301, "/?error=access_denied");
             return
         }

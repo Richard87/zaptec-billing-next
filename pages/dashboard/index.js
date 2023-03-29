@@ -8,9 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import {COOKIE} from "../../src/cookie";
 import Head from "next/head";
-// import Prices from "./old_prices/prices.json"
 import SupportPrice from "./support.json"
-// import axios from 'axios'
 
 export const getServerSideProps = withIronSessionSsr(
     async function ({req, res,}) {
@@ -37,8 +35,29 @@ export default function Dashboard() {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [change, setChange] = useState(false)
+  
 
-  const {data: chargers, isLoading: isLoadingChargers} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
+  function destroySession(){
+    console.log('desroy')
+    fetch('/api/sessionDestroy').then(res=>res.json())
+    window.location.href = "/dashboard"
+  }
+
+  const {data: chargers, isLoading: isLoadingChargers} = useQuery("chargers", () => 
+    fetch("/api/chargers").then((response) => {
+        if (!response.ok) {
+          destroySession()
+        }
+        return response.json();
+    })
+    .catch((error) => {
+        console.log(error)
+    })
+  )
+
+  // const {data: chargers, isLoading: isLoadingChargers} = useQuery("chargers", () => fetch("/api/chargers").then(res => res.json()))
+
+
 
   const {data: sessions, isLoading: isLoadingSessions} = useQuery(
       "sessions-"+charger,
@@ -64,8 +83,8 @@ export default function Dashboard() {
   return (
       <>
       {/* <Button onClick={()=>{
-        fetchLyse(true)
-      }}>Get</Button> */}
+        destroySession();
+      }}>Delete zaptec cookie</Button> */}
         <Head>
           <title>Zaptec charging price</title>
         </Head>

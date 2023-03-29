@@ -11,6 +11,7 @@ export default withIronSessionApiRoute(
 
             // console.log("chargers", Data)
 
+            // res.status(401)
             res.status(200).json(Data)
         } catch (e) {
             res.status(401);
@@ -34,7 +35,6 @@ const FetchChargers = async (token) => {
 
         const response = await fetch(url, {headers: {"Authorization":`Bearer ${token}`}})
         const {Data} = await response.json()
-
 
         cache.put(url+token, Data, hours * 1000 * 60 * 60);
         return Data;

@@ -21,7 +21,7 @@ export default withIronSessionApiRoute(
 
                 Data = await FetchPage(charger, page, access_token)
             }
-
+            
             res.status(200).json(result)
             res.end()
         } catch (e) {
