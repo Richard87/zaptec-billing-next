@@ -27,18 +27,14 @@ const Stromstotte = async (req, res) => {
                : kompensasjonSommer && (item.year <= 2023 && (item.month > 3 || item.month < 9)) ? ((price.priceIncludingVat*100)-87.5)*0.8
                : ((price.priceIncludingVat*100)-87.5)*0.9
  
-            // return {
-            //    year: item.year, 
-            //    month: item.month, 
-            //    ...price, 
-            //    kalkulertKompnsasjon: Math.round(kalkulertKompnsasjon*100)/100
-            // }
             const zeroPad = (num, places) => String(num).padStart(places, '0')
             return {
                [`${item.year}.${zeroPad(item.month, 2)}`]: Math.round(kalkulertKompnsasjon*100)/100
             }
          }).reverse()
+
          const merged = Object.assign(...data)
+         
          //Sett data i memory cache. Brukes om det ikke endres dato
          const hours = 1
          cache.put('stotte', merged, hours * 1000 * 60 * 60)
