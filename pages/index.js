@@ -1,20 +1,15 @@
 import Head from "next/head";
-import Image from "next/image";
 import {COOKIE} from "../src/cookie"
 import { withIronSessionSsr } from "iron-session/next";
-import styles from "../styles/Home.module.css";
+// import styles from "../styles/Home.module.css";
 import {
   Button,
-  Container,
-  FormControl,
   Grid,
-  Paper,
   TextField,
   Typography,
   Card,
   CardContent,
   CardActions,
-  CardHeader,
 } from "@mui/material";
 
 export const getServerSideProps = withIronSessionSsr(
