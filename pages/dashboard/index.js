@@ -10,8 +10,8 @@ import {
 import { useEffect, useState } from "react";
 import { COOKIE } from "../../src/cookie";
 import Head from "next/head";
-import { ReportCard } from "./components/reportCard";
-import { SettingsCard } from "./components/settingsCard";
+import ReportCard from "./components/reportCard";
+import SettingsCard from "./components/settingsCard";
 
 export const getServerSideProps = withIronSessionSsr(async function ({
    req,

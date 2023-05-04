@@ -11,7 +11,7 @@ import {
    Paper,
 } from "@mui/material";
 
-export const ReportCard = ({ charger, start, end, sessions, prices }) => {
+const ReportCard = ({ charger, start, end, sessions, prices }) => {
    start = parseISO(start);
    end = parseISO(end);
 
@@ -129,3 +129,5 @@ export const ReportCard = ({ charger, start, end, sessions, prices }) => {
       </>
    );
 };
+
+export default ReportCard;

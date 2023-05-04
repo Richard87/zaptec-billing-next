@@ -6,14 +6,14 @@ import {
    MenuItem,
 } from "@mui/material";
 
-export function SettingsCard({ chargers, onChangeCharger, onChangeStart, onChangeEnd, charger, start, end }) {
+export default function SettingsCard({ chargers, onChangeCharger, onChangeStart, onChangeEnd, charger, start, end }) {
    return (
       <Card>
          <CardContent>
             <Grid container spacing={3}>
                <Grid item xs={12}>
                   <TextField fullWidth value={charger} select onChange={onChangeCharger} label={"Charger"}>
-                     {chargers.map((charger) => (
+                     {chargers && chargers.map((charger) => (
                         <MenuItem key={charger.Id} value={charger.Id}>
                            {charger.Name}
                         </MenuItem>
