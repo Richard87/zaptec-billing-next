@@ -42,7 +42,7 @@ const getContentful = async (req, res) => {
             };
          });
 
-         console.log(returnData)
+         // console.log(returnData)
          //Sett data i memory cache. Brukes om det ikke endres dato
          const hours = 1;
          cache.put("prices", returnData, hours * 1000 * 60 * 60);

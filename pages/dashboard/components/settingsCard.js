@@ -30,7 +30,7 @@ export default function SettingsCard({ chargers, onChangeCharger, onChangeStart,
                         onChange={onChangeStart}
                         type="month"
                         InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: "2022-01", max: "2023-06" }}
+                        inputProps={{ min: "2022-01", max: "2030-06" }}
                      />
                   </Grid>
                   <Grid item xs={6}>
@@ -42,7 +42,7 @@ export default function SettingsCard({ chargers, onChangeCharger, onChangeStart,
                         value={end}
                         onChange={onChangeEnd}
                         type="month"
-                        inputProps={{ min: "2022-01", max: "2023-06" }}
+                        inputProps={{ min: "2022-01", max: "2030-06" }}
                      />
                   </Grid>
                </Grid>

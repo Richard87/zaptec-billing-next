@@ -28,7 +28,6 @@ const FetchChargers = async (token) => {
     const cachedResponse = cache.get(url+token);
 
     if (cachedResponse) {
-        // console.log(cachedResponse)
         return cachedResponse;
     } else {
         const hours = 1;
